@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+
+{% set active_page = "Heatmap" %}
+{% block head_content %}
+<style>
+  :root {
+    --accent: #2A9D8F;
+    --border-width: 6px;
+    --border-radius: 40px;
+    --font-size: 16px;
+  }
+
+  body {
+    overflow: hidden;
+  }
+
+  .container {
+    perspective: 800px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    font-family: sans-serif;
+  }
+
+  .toggle {
+    position: relative;
+    border: solid var(--border-width) var(--accent);
+    border-radius: var(--border-radius);
+    transition: transform cubic-bezier(0, 0, 0.3, 2) 0.4s;
+    transform-style: preserve-3d;
+    background-color: white;
+    perspective: 800px;
+  }
+
+  .toggle > input[type="radio"] {
+    display: none;
+  }
+
+  .toggle > #choice1:checked ~ #flap {
+    transform: rotateY(-180deg);
+  }
+
+  .toggle > #choice1:checked ~ #flap > .content {
+    transform: rotateY(-180deg);
+  }
+
+  .toggle > #choice2:checked ~ #flap {
+    transform: rotateY(0deg);
+  }
+
+  .toggle > label {
+    display: inline-block;
+    min-width: 110px;
+    padding: 15px;
+    font-size: var(--font-size);
+    text-align: center;
+    color: var(--accent);
+    cursor: pointer;
+  }
+
+  .toggle > label,
+  .toggle > #flap {
+    font-weight: bold;
+    text-transform: capitalize;
+  }
+
+  .toggle > #flap {
+    position: absolute;
+    top: calc(0px - var(--border-width));
+    left: 50%;
+    height: calc(100% + var(--border-width) * 2);
+    width: 51%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: var(--font-size);
+    background-color: var(--accent);
+    border-top-right-radius: var(--border-radius);
+    border-bottom-right-radius: var(--border-radius);
+    transform-style: preserve-3d;
+    transform-origin: left;
+    transition: transform cubic-bezier(0.4, 0, 0.2, 1) 0.5s;
+  }
+
+  .toggle > #flap > .content {
+    color: white;
+    transition: transform 0s linear 0.25s;
+    transform-style: preserve-3d;
+  }
+
+  #iframe-unit, #iframe-house {
+    position: absolute;
+    left: 0;
+    width: -webkit-fill-available;
+  }
+</style>
+
+<style>
+  .lds-container {
+    position: fixed;
+    left: 50%;
+    top: 62%;
+  }
+  .lds-ellipsis {
+    display: inline-block;
+    position: relative;
+    transform: translate(-50%, -50%);
+    width: 80px;
+    height: 80px;
+  }
+  .lds-ellipsis div {
+    position: absolute;
+    top: 33px;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: black;
+    animation-timing-function: cubic-bezier(0, 1, 1, 0);
+  }
+  .lds-ellipsis div:nth-child(1) {
+    left: 8px;
+    animation: lds-ellipsis1 0.6s infinite;
+  }
+  .lds-ellipsis div:nth-child(2) {
+    left: 8px;
+    animation: lds-ellipsis2 0.6s infinite;
+  }
+  .lds-ellipsis div:nth-child(3) {
+    left: 32px;
+    animation: lds-ellipsis2 0.6s infinite;
+  }
+  .lds-ellipsis div:nth-child(4) {
+    left: 56px;
+    animation: lds-ellipsis3 0.6s infinite;
+  }
+  @keyframes lds-ellipsis1 {
+    0% {
+      transform: scale(0);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  @keyframes lds-ellipsis3 {
+    0% {
+      transform: scale(1);
+    }
+    100% {
+      transform: scale(0);
+    }
+  }
+  @keyframes lds-ellipsis2 {
+    0% {
+      transform: translate(0, 0);
+    }
+    100% {
+      transform: translate(24px, 0);
+    }
+  }
+</style>
+{% endblock %}
+
+{% block body_content %}
+<div class="container">
+  <form class="toggle">
+    <input type="radio" id="choice1" name="choice" value="/figUnit" />
+    <label for="choice1">Unit</label>
+
+    <input type="radio" id="choice2" name="choice" value="/figHouse" checked />
+    <label for="choice2">House</label>
+
+    <div id="flap"><span class="content">Unit</span></div>
+  </form>
+</div>
+<div>
+  <div id="iframe-unit">
+    <div class="lds-container">
+      <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+    </div>
+    <iframe
+      src="/figUnit"
+      loading="lazy"
+      title="heatmap of unit prices"
+    ></iframe>
+  </div>
+  <div id="iframe-house">
+    <div class="lds-container">
+      <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+    </div>
+    <iframe
+      src="/figHouse"
+      loading="lazy"
+      title="heatmap of house prices"
+    ></iframe>
+  </div>
+</div>
+
+<script>
+  const flap = document.querySelector("#flap");
+  const toggle = document.querySelector(".toggle");
+
+  const choice1 = document.querySelector("#choice1");
+  const choice2 = document.querySelector("#choice2");
+
+  const iframe1 = document.querySelector("#iframe-unit");
+  const iframe2 = document.querySelector("#iframe-house");
+
+  flap.addEventListener("transitionend", () => {
+    if (choice1.checked) {
+      toggle.style.transform = "rotateY(-15deg)";
+      setTimeout(() => (toggle.style.transform = ""), 400);
+    } else {
+      toggle.style.transform = "rotateY(15deg)";
+      setTimeout(() => (toggle.style.transform = ""), 400);
+    }
+  });
+
+  clickHandler = (e) => {
+    if (e.target.tagName === "LABEL") {
+      setTimeout(() => {
+        flap.children[0].textContent = e.target.textContent;
+      }, 250);
+    }
+  };
+
+  document.addEventListener("DOMContentLoaded", () => {
+    flap.children[0].textContent = choice2.nextElementSibling.textContent;
+  });
+
+  document.addEventListener("click", (e) => clickHandler(e));
+
+  // show corresponding iframes when radio button is clicked
+  choice1.onclick = function(e) {
+    iframe1.style.display = "contents";
+    iframe2.style.display = "none";
+  };
+
+  choice2.onclick = function(e) {
+    iframe1.style.display = "none";
+    iframe2.style.display = "contents";
+  };
+
+  // default choice2 (house)
+  choice2.onclick();
+
+  // hide loading spinner when iframe has loaded
+  const hideLoad1 = () => iframe1.children[0].style.display = "none";
+  iframe1.children[1].addEventListener("load", e => setTimeout(hideLoad1, 1000));
+  const hideLoad2 = () => iframe2.children[0].style.display = "none";
+  iframe2.children[1].addEventListener("load", e => setTimeout(hideLoad2, 1000));
+</script>
+{% endblock %}

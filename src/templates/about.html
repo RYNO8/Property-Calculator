@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% set active_page = "About" %}
+
+{% block body_content %}
+    <table><tr>
+        <td style="width: 100%; vertical-align: top">
+            <h1 style="font-size: 50px; margin-bottom: 0px; color: #E76F51">Sydney Property Calculator</h1>
+            <i style="font-size: 30px; margin-top: 0px; color: #F4A261">Helping you discover your ideal suburb</i>
+            <br>
+
+            <h2 style="font-size: 35px;">Deciding where to buy or rent?</h2>
+            <p style="font-size: 25px;">There are so many factors to consider:</p>
+            <div style="padding: 0px 20px">
+                <div><a class="home-point" href="/search">Comparison of suburb prices</a></div>
+                <div><a class="home-point" href="/prices/">House prices for sale and rent in your suburb</a></div>
+                <div><a class="home-point" href="/suburbQuery">Amenities & Schools</a></div>
+                <div><a class="home-point" href="/demographics/">Demographics of your suburb</a></div>
+                <div><a class="home-point" href="/terrain">Is your view obstructed?</a></div>
+            </div>
+        </td>
+        <td><img src="/static/images/cover-picture.jpg" style="height: 550px"></td>
+    </tr></table>
+{% endblock %}

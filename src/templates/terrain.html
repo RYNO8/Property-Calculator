@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% set active_page = "Terrain" %}
+
+{% block head_content %}
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v1.10.1/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v1.10.1/mapbox-gl.css" rel="stylesheet" />
+{% endblock %}
+
+{% block body_content %}
+    <div id="map"></div>
+    <script>
+        mapboxgl.accessToken = "pk.eyJ1IjoicnlubyIsImEiOiJja2E2cG4xeGUwM2dyMnNvMTV0d3czNWQ5In0.tqlSNBsSHRIFVAxGLDHrXg";
+        var map = new mapboxgl.Map({
+            style: "mapbox://styles/mapbox/light-v10",
+            center: {{ coord }},
+            zoom: 18,
+            pitch: 85, // towards 0 is top view, towards 90 is street view
+            //bearing: -17.6,
+            container: "map",
+            antialias: true
+        });
+        map.addControl(new mapboxgl.FullscreenControl());
+
+        map.on("load", function() {
+        var layers = map.getStyle().layers;
+        var labelLayerId;
+        for (var i = 0; i < layers.length; i++) {
+            if (layers[i].type === "symbol" && layers[i].layout["text-field"]) {
+                labelLayerId = layers[i].id;
+                break;
+            }
+        }
+
+        map.addLayer(
+            {
+                "id": "3d-buildings",
+                "source": "composite",
+                "source-layer": "building",
+                "filter": ["==", "extrude", "true"],
+                "type": "fill-extrusion",
+                "minzoom": 15,
+                "paint": {
+                    "fill-extrusion-color": "#aaa",
+                    "fill-extrusion-height": ["get", "height"],
+                    "fill-extrusion-base": ["get", "min_height"],
+                    "fill-extrusion-opacity": 0.6
+                }
+            },
+            labelLayerId
+        );
+    });
+    </script>
+{% endblock %}
